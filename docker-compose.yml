@@ -1,0 +1,38 @@
+version: "3.9"
+
+# ============================================================
+# CAUSAL Platform — Docker Compose (local development)
+# ============================================================
+# Purpose: Provides PostgreSQL for local development.
+# The frontend and API are run directly on the host machine
+# for fast iteration.
+#
+# Usage:
+#   docker-compose up -d          # start PostgreSQL
+#   docker-compose down           # stop services
+#   docker-compose down -v        # stop + remove volumes (wipes DB)
+# ============================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: causal_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: causal
+      POSTGRES_PASSWORD: causal_dev_password
+      POSTGRES_DB: causal_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - causal_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U causal -d causal_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  causal_postgres_data:
+    driver: local

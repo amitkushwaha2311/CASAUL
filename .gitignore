@@ -1,0 +1,115 @@
+# ============================================================
+# CAUSAL Platform — .gitignore
+# ============================================================
+
+# ── Environment ──────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ── Node / npm ───────────────────────────────────────────────
+node_modules/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── Next.js ──────────────────────────────────────────────────
+apps/web/.next/
+apps/web/out/
+apps/web/.vercel/
+apps/web/next-env.d.ts
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ── Python virtual environments ──────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+apps/api/.venv/
+
+# ── Pytest ───────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+
+# ── Mypy ─────────────────────────────────────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ── Ruff ─────────────────────────────────────────────────────
+.ruff_cache/
+
+# ── TypeScript ───────────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Editors ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+ehthumbs.db
+Desktop.ini
+
+# ── Docker ───────────────────────────────────────────────────
+# Keep docker-compose committed, exclude generated volumes
+.docker/
+
+# ── Alembic ──────────────────────────────────────────────────
+# migrations are committed intentionally — no exclusions
+
+# ── Testing artifacts ─────────────────────────────────────────
+coverage/
+test-results/
+playwright-report/
+
+# ── Misc ─────────────────────────────────────────────────────
+*.bak
+*.tmp
+.turbo/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3

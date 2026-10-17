@@ -1,0 +1,3 @@
+"""
+CAUSAL API — Core package.
+"""
