@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "motion/react";
 const HERO_VIDEO_URL =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_080021_d598092b-c4c2-4e53-8e46-94cf9064cd50.mp4";
 
+const apiDocsUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/docs`;
 const HEADLINE_WORDS = ["SEE", "THE", "CASCADE.", "BEFORE", "IT", "HAPPENS."];
 
 export function CinematicHero() {
@@ -145,7 +146,7 @@ export function CinematicHero() {
             </Link>
 
             <a
-              href="http://localhost:8000/api/docs"
+              href={apiDocsUrl}
               target="_blank"
               rel="noopener noreferrer"
               id="api-docs-link"

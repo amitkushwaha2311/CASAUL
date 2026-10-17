@@ -6,6 +6,11 @@ import Link from "next/link";
 const DRIFTBAR_FOOTER_VIDEO =
   "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/4d01c727-d9c5-47c8-a778-35a451ffd39f.mp4";
 
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const apiDocsUrl = `${apiBaseUrl}/api/docs`;
+const apiHealthUrl = `${apiBaseUrl}/api/v1/health`;
+const apiGraphsUrl = `${apiBaseUrl}/api/v1/graphs`;
+
 export function LandingFooter() {
   return (
     <footer className="driftbar-footer border-t border-[rgba(240,237,229,0.10)]" id="platform-footer">
@@ -164,7 +169,7 @@ export function LandingFooter() {
           <ul className="space-y-2 text-[#A7A398]">
             <li>
               <a
-                href="http://localhost:8000/api/docs"
+                href={apiDocsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[#F0EDE5] transition-colors inline-flex items-center gap-1.5"
@@ -175,7 +180,7 @@ export function LandingFooter() {
             </li>
             <li>
               <a
-                href="http://localhost:8000/api/v1/health"
+                href={apiHealthUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[#F0EDE5] transition-colors inline-flex items-center gap-1.5"
@@ -186,7 +191,7 @@ export function LandingFooter() {
             </li>
             <li>
               <a
-                href="http://localhost:8000/api/v1/graphs"
+                href={apiGraphsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[#F0EDE5] transition-colors inline-flex items-center gap-1.5"
