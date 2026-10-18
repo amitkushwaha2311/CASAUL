@@ -29,8 +29,44 @@ import { parseApiResponse } from "./api-error";
 
 // ── Base URL ───────────────────────────────────────────────────
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const PRODUCTION_API_URL = "https://casaul.onrender.com";
+export const LOCAL_API_URL = "http://localhost:8000";
+
+/**
+ * Returns the active API base URL.
+ * 
+ * Precedence:
+ * 1. process.env.NEXT_PUBLIC_API_URL (if set, stripped of trailing slash)
+ * 2. Browser runtime: if running on non-localhost (e.g. *.vercel.app), returns https://casaul.onrender.com
+ * 3. Server runtime: if NODE_ENV === "production" or VERCEL is set, returns https://casaul.onrender.com
+ * 4. Fallback to local development server (http://localhost:8000)
+ */
+export function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
+  }
+
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    const isLocal =
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname.endsWith(".local");
+    if (!isLocal) {
+      return PRODUCTION_API_URL;
+    }
+    return LOCAL_API_URL;
+  }
+
+  if (process.env.NODE_ENV === "production" || process.env.VERCEL) {
+    return PRODUCTION_API_URL;
+  }
+
+  return LOCAL_API_URL;
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 // ── Core fetch helper ──────────────────────────────────────────
 
@@ -58,7 +94,9 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     init.body = JSON.stringify(body);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, init);
+  const baseUrl = getApiBaseUrl().replace(/\/+$/, "");
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const response = await fetch(`${baseUrl}${cleanPath}`, init);
   return parseApiResponse<T>(response);
 }
 

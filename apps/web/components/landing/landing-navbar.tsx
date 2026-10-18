@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useScroll, useSpring } from "motion/react";
 import { useAuth } from "@/lib/auth-context";
+import { getApiBaseUrl } from "@/lib/api-client";
 
 const NAV_LINKS = [
   { href: "#dependency-visualization", label: "Cascade Visualizer" },
@@ -13,9 +14,8 @@ const NAV_LINKS = [
   { href: "#domains", label: "Domains" },
 ];
 
-const apiDocsUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/docs`;
-
 export function LandingNavbar() {
+  const apiDocsUrl = `${getApiBaseUrl()}/api/docs`;
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isAuthenticated, isLoading, logout } = useAuth();

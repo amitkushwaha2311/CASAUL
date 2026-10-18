@@ -24,9 +24,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { getApiBaseUrl } from "./api-client";
 
 const TOKEN_KEY = "causal_access_token";
 
@@ -98,7 +96,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
-      const res = await fetch(`${API_BASE_URL}${path}`, {
+      const baseUrl = getApiBaseUrl().replace(/\/+$/, "");
+      const cleanPath = path.startsWith("/") ? path : `/${path}`;
+      const res = await fetch(`${baseUrl}${cleanPath}`, {
         ...options,
         headers,
       });
@@ -135,7 +135,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+      const baseUrl = getApiBaseUrl().replace(/\/+$/, "");
+      const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +168,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(
     async (email: string, displayName: string, password: string) => {
-      const res = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+      const baseUrl = getApiBaseUrl().replace(/\/+$/, "");
+      const res = await fetch(`${baseUrl}/api/v1/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

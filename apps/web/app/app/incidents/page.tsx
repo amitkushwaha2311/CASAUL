@@ -14,7 +14,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { staggerContainer, staggerItem } from "@/lib/motion-config";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, getApiBaseUrl } from "@/lib/api-client";
 import type { EventResponse, EventStatisticsResponse } from "@causal/shared/src/index";
 
 // ── Severity display config ────────────────────────────────────────────────
@@ -50,7 +50,7 @@ function useEventStream(
     if (!graphId) return;
     setWsState("connecting");
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+    const apiBase = getApiBaseUrl();
     const wsBase = apiBase.replace(/^http/, "ws");
     const ws = new WebSocket(`${wsBase}/api/v1/ws/graphs/${graphId}/events`);
     wsRef.current = ws;

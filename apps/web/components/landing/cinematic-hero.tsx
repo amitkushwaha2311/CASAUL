@@ -3,14 +3,15 @@
 import React from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
+import { getApiBaseUrl } from "@/lib/api-client";
 
 const HERO_VIDEO_URL =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_080021_d598092b-c4c2-4e53-8e46-94cf9064cd50.mp4";
 
-const apiDocsUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/docs`;
 const HEADLINE_WORDS = ["SEE", "THE", "CASCADE.", "BEFORE", "IT", "HAPPENS."];
 
 export function CinematicHero() {
+  const apiDocsUrl = `${getApiBaseUrl()}/api/docs`;
   const shouldReduceMotion = useReducedMotion();
 
   const wordAnimationVariants = {

@@ -2,16 +2,16 @@
 
 import React from "react";
 import Link from "next/link";
+import { getApiBaseUrl } from "@/lib/api-client";
 
 const DRIFTBAR_FOOTER_VIDEO =
   "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/4d01c727-d9c5-47c8-a778-35a451ffd39f.mp4";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-const apiDocsUrl = `${apiBaseUrl}/api/docs`;
-const apiHealthUrl = `${apiBaseUrl}/api/v1/health`;
-const apiGraphsUrl = `${apiBaseUrl}/api/v1/graphs`;
-
 export function LandingFooter() {
+  const apiBaseUrl = getApiBaseUrl();
+  const apiDocsUrl = `${apiBaseUrl}/api/docs`;
+  const apiHealthUrl = `${apiBaseUrl}/api/v1/health`;
+  const apiGraphsUrl = `${apiBaseUrl}/api/v1/graphs`;
   return (
     <footer className="driftbar-footer border-t border-[rgba(240,237,229,0.10)]" id="platform-footer">
       {/* ── Layer 0: Original Driftbar Reference Video ─────────────────── */}

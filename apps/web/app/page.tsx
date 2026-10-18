@@ -26,6 +26,7 @@ import { DigitalTwinScenarioSandbox } from "@/components/landing/digital-twin-sc
 import { DomainResilienceGrid } from "@/components/landing/domain-resilience-grid";
 import { LenisProvider } from "@/components/landing/lenis-provider";
 import { MotionReveal } from "@/components/ui/motion-reveal";
+import { getApiBaseUrl } from "@/lib/api-client";
 
 export const metadata: Metadata = {
   title: "CAUSAL — See the Cascade Before It Happens",
@@ -33,9 +34,8 @@ export const metadata: Metadata = {
     "Autonomous causal reasoning, predictive blast-radius forecasting, and counterfactual scenario modeling for interconnected cyber-physical infrastructure systems.",
 };
 
-const apiDocsUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/docs`;
-
 export default function HomePage() {
+  const apiDocsUrl = `${getApiBaseUrl()}/api/docs`;
   return (
     <LenisProvider>
       <div className="min-h-screen bg-[#111210] text-[#F0EDE5] relative selection:bg-[#A99A80]/30 selection:text-white overflow-x-hidden">
