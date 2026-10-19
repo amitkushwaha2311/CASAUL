@@ -13,6 +13,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import App from "@/src/App";
 import { apiClient } from "@/lib/api-client";
 import {
   Badge,
@@ -341,7 +342,12 @@ export default function OverviewDashboard() {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-[1640px] mx-auto space-y-6 text-[#F0EDE5]">
+    <div className="flex flex-col w-full">
+      {/* ── RIVR Glassmorphism Hero (Post-Login Authenticated Experience) ── */}
+      <App />
+
+      {/* ── CAUSAL Platform Overview Telemetry Dashboard ── */}
+      <div id="overview-telemetry-dashboard" className="p-4 sm:p-6 lg:p-8 max-w-[1640px] mx-auto space-y-6 text-[#F0EDE5] w-full bg-[#111210]">
       {/* ── Top Header Bar ────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[rgba(240,237,229,0.08)]">
         <div>
@@ -900,5 +906,6 @@ export default function OverviewDashboard() {
         </div>
       </div>
     </div>
+  </div>
   );
 }
