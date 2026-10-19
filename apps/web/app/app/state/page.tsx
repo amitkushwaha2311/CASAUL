@@ -17,6 +17,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { apiClient } from "@/lib/api-client";
+import { formatUtcDateTime } from "@/lib/telemetry-freshness";
 import type {
   CurrentGraphStateResponse,
   NodeStateDetail,
@@ -435,7 +436,7 @@ export default function DigitalTwinPage() {
                   <div>Source: <strong>{selectedNode.provenance?.source ?? selectedNode.source ?? "unknown"}</strong></div>
                   <div>Type: <strong>{selectedNode.provenance?.source_type ?? "direct"}</strong></div>
                   <div>Confidence: <strong>{selectedNode.confidence !== null ? `${(selectedNode.confidence * 100).toFixed(0)}%` : "Unknown (unassessed)"}</strong></div>
-                  <div>Last Observed: <strong>{selectedNode.last_observed_at ? new Date(selectedNode.last_observed_at).toLocaleTimeString() : "Never"}</strong></div>
+                  <div>Last Observed: <strong>{selectedNode.last_observed_at ? formatUtcDateTime(new Date(selectedNode.last_observed_at)) : "Never"}</strong></div>
                   {selectedNode.provenance?.observation_id && (
                     <div>Observation ID: <code>{selectedNode.provenance.observation_id.slice(0, 8)}...</code></div>
                   )}
@@ -467,7 +468,7 @@ export default function DigitalTwinPage() {
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                           <strong>{h.state || h.metric}</strong>
                           <span style={{ color: "var(--color-text-tertiary)" }}>
-                            {new Date(h.observed_at).toLocaleTimeString()}
+                            {formatUtcDateTime(new Date(h.observed_at))}
                           </span>
                         </div>
                         <div style={{ color: "var(--color-text-secondary)", marginTop: "0.25rem" }}>

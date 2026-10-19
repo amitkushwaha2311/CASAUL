@@ -176,13 +176,13 @@ class CurrentStateService:
                 )
 
         if not provenance:
-            # Fall back to node created_at / initial record
+            # Fall back to initial topology record (unobserved)
             source = "initial_topology"
-            last_observed_at = node.created_at
+            last_observed_at = None
             provenance = StateProvenance(
                 source="initial_topology",
                 source_type="initialization",
-                observed_at=node.created_at,
+                observed_at=None,
                 recorded_at=node.created_at,
             )
 

@@ -15,6 +15,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { apiClient } from "@/lib/api-client";
+import { formatUtcDateTime } from "@/lib/telemetry-freshness";
 import type {
   GraphResponse,
   NodeResponse,
@@ -606,7 +607,7 @@ export default function CausalReasoningPage() {
                               {ev.record_id.slice(0, 8)}...
                             </td>
                             <td style={{ padding: "0.5rem", color: "var(--color-text-secondary)" }}>
-                              {ev.observed_at ? new Date(ev.observed_at).toLocaleTimeString() : "—"}
+                              {ev.observed_at ? formatUtcDateTime(new Date(ev.observed_at)) : "—"}
                             </td>
                             <td style={{ padding: "0.5rem" }}>
                               {ev.confidence !== null && ev.confidence !== undefined

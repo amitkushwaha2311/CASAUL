@@ -23,6 +23,11 @@ import {
   ErrorState,
   EmptyState,
 } from "@/components/ui";
+import {
+  classifyTelemetryFreshness,
+  formatHistoricalEventTime,
+  formatUtcDateTime,
+} from "@/lib/telemetry-freshness";
 import type {
   GraphResponse,
   SystemStateSummaryResponse,
@@ -69,18 +74,7 @@ function mapSeverityToBadge(severity: string): "critical" | "degraded" | "info" 
 }
 
 function formatRelativeTime(dateString?: string | null): string {
-  if (!dateString) return "No telemetry";
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (diffSec < 10) return "Just now";
-  if (diffSec < 60) return `${diffSec}s ago`;
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  return date.toLocaleDateString([], { month: "short", day: "numeric" });
+  return classifyTelemetryFreshness(dateString).label;
 }
 
 // ── Operational Graph Filter ───────────────────────────────────────────────
@@ -300,6 +294,8 @@ export default function OverviewDashboard() {
     return new Date(s.latest_state_update_at) > new Date(latest) ? s.latest_state_update_at : latest;
   }, null);
 
+  const platformFreshness = classifyTelemetryFreshness(latestStateUpdateAt);
+
   const platformIsHealthy = health?.status === "healthy" && health?.database === "connected";
 
   // ── Render States ────────────────────────────────────────────────────────
@@ -354,7 +350,8 @@ export default function OverviewDashboard() {
         hypothesesCount={allHypotheses.length}
         supportedHypothesesCount={supportedHypotheses.length}
         avgHealthPercent={avgHealthPercent}
-        latestTelemetryTime={formatRelativeTime(latestStateUpdateAt)}
+        latestTelemetryTime={platformFreshness.label}
+        latestTelemetryStatus={platformFreshness.status}
         databaseStatus={health?.database}
         causalEngineActive={systemStatus?.features.causal_engine}
       />
@@ -391,10 +388,22 @@ export default function OverviewDashboard() {
             <span className="text-[#736F66]">·</span>
             <span>Refreshed: {lastRefreshed.toLocaleTimeString()}</span>
             <span className="text-[#736F66]">·</span>
-            <span>
-              Telemetry freshness:{" "}
-              <strong className="text-[#F0EDE5]">
-                {formatRelativeTime(latestStateUpdateAt)}
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-[#736F66]">Telemetry freshness:</span>
+              <strong
+                id="telemetry-freshness-value"
+                className={`font-semibold px-2 py-0.5 rounded text-[11px] border ${
+                  platformFreshness.status === "fresh"
+                    ? "bg-[#82977D]/15 border-[#82977D]/40 text-[#82977D]"
+                    : platformFreshness.status === "delayed"
+                    ? "bg-[#A99A80]/15 border-[#A99A80]/40 text-[#A99A80]"
+                    : platformFreshness.status === "stale"
+                    ? "bg-[#9B4540]/15 border-[#9B4540]/40 text-[#9B4540]"
+                    : "bg-[#736F66]/15 border-[#736F66]/30 text-[#A7A398]"
+                }`}
+                title={platformFreshness.formattedUtc ?? undefined}
+              >
+                {platformFreshness.label}
               </strong>
             </span>
           </div>
@@ -639,9 +648,26 @@ export default function OverviewDashboard() {
                         )}
                       </div>
 
-                      <div className="text-[11px] text-[#736F66]">
-                        {formatRelativeTime(summary?.latest_state_update_at)}
-                      </div>
+                      {(() => {
+                        const cardFreshness = classifyTelemetryFreshness(summary?.latest_state_update_at);
+                        return (
+                          <div
+                            className={`text-[11px] font-mono flex items-center gap-1 ${
+                              cardFreshness.status === "fresh"
+                                ? "text-[#82977D]"
+                                : cardFreshness.status === "delayed"
+                                ? "text-[#A99A80]"
+                                : cardFreshness.status === "stale"
+                                ? "text-[#9B4540]"
+                                : "text-[#736F66]"
+                            }`}
+                            title={cardFreshness.formattedUtc ?? undefined}
+                          >
+                            <span>◈</span>
+                            <span>{cardFreshness.label}</span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 </Link>
@@ -704,8 +730,11 @@ export default function OverviewDashboard() {
                       </div>
                     </div>
 
-                    <time className="text-[10px] font-mono text-[#736F66] flex-shrink-0">
-                      {formatRelativeTime(ev.timestamp)}
+                    <time
+                      className="text-[10px] font-mono text-[#736F66] flex-shrink-0"
+                      title={formatUtcDateTime(new Date(ev.timestamp))}
+                    >
+                      {formatHistoricalEventTime(ev.timestamp)}
                     </time>
                   </div>
                 );
@@ -873,24 +902,58 @@ export default function OverviewDashboard() {
             </h2>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-[rgba(240,237,229,0.08)] bg-[#111210] space-y-2 text-xs font-mono">
-            <div className="flex items-center justify-between">
-              <span className="text-[#736F66]">Latest Observation:</span>
-              <span className="text-[#F0EDE5]">
-                {latestStateUpdateAt ? new Date(latestStateUpdateAt).toLocaleTimeString() : "—"}
+          <div className="p-3.5 rounded-xl border border-[rgba(240,237,229,0.08)] bg-[#111210] space-y-2.5 text-xs font-mono">
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-[#736F66] flex-shrink-0">Latest Observation:</span>
+              <span
+                className={`text-right font-medium break-all ${
+                  platformFreshness.status === "fresh"
+                    ? "text-[#82977D]"
+                    : platformFreshness.status === "stale"
+                    ? "text-[#9B4540]"
+                    : platformFreshness.hasData
+                    ? "text-[#F0EDE5]"
+                    : "text-[#736F66]"
+                }`}
+                title={platformFreshness.formattedIso ?? undefined}
+              >
+                {platformFreshness.formattedUtc ?? "No observations"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#736F66]">Sync Cycle:</span>
-              <span className="text-[#82977D]">Live (30s interval)</span>
+              <span className="text-[#736F66]">Telemetry State:</span>
+              <span
+                className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold border ${
+                  platformFreshness.status === "fresh"
+                    ? "bg-[#82977D]/15 border-[#82977D]/40 text-[#82977D]"
+                    : platformFreshness.status === "delayed"
+                    ? "bg-[#A99A80]/15 border-[#A99A80]/40 text-[#A99A80]"
+                    : platformFreshness.status === "stale"
+                    ? "bg-[#9B4540]/15 border-[#9B4540]/40 text-[#9B4540]"
+                    : "bg-[#736F66]/15 border-[#736F66]/30 text-[#736F66]"
+                }`}
+              >
+                {platformFreshness.status === "stale" ? "STALE TELEMETRY" : platformFreshness.shortLabel.toUpperCase()}
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#736F66]">API Status:</span>
-              <span className="text-[#82977D]">{health?.status ?? "—"}</span>
+              <span className="text-[#736F66]">Client Polling:</span>
+              <span className="text-[#82977D] flex items-center gap-1.5">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#82977D] animate-pulse" />
+                Active (30s interval · Synced {lastRefreshed.toLocaleTimeString([], { hour12: false })})
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[#736F66]">API Link:</span>
+              <span className={health?.status === "healthy" ? "text-[#82977D]" : "text-[#9B4540]"}>
+                {health?.status ? health.status.toUpperCase() : "UNKNOWN"}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#736F66]">Storage Link:</span>
-              <span className="text-[#A7A398]">{health?.database ?? "—"}</span>
+              <span className={health?.database === "connected" ? "text-[#82977D]" : "text-[#A7A398]"}>
+                {health?.database ? health.database.toUpperCase() : "UNKNOWN"}
+              </span>
             </div>
           </div>
 

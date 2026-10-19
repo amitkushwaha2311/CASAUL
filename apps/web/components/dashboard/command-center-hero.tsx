@@ -26,6 +26,7 @@ export interface CommandCenterHeroProps {
   supportedHypothesesCount: number;
   avgHealthPercent: string;
   latestTelemetryTime?: string | null;
+  latestTelemetryStatus?: "fresh" | "delayed" | "stale" | "no_data";
   databaseStatus?: string;
   causalEngineActive?: boolean;
 }
@@ -41,6 +42,7 @@ export function CommandCenterHero({
   supportedHypothesesCount,
   avgHealthPercent,
   latestTelemetryTime,
+  latestTelemetryStatus = "no_data",
   databaseStatus = "connected",
   causalEngineActive = true,
 }: CommandCenterHeroProps) {
@@ -337,12 +339,41 @@ export function CommandCenterHero({
           {/* 6. Telemetry & Evidence Freshness */}
           <div className="p-2.5 rounded-lg bg-[#20211D]/80 border border-[rgba(240,237,229,0.08)] flex flex-col justify-between">
             <span className="text-[10px] uppercase text-[#736F66] tracking-wider">Freshness</span>
-            <div className="text-xs font-semibold text-[#F0EDE5] my-0.5 truncate">
-              {latestTelemetryTime || "Nominal"}
+            <div
+              className={`text-xs font-semibold my-0.5 truncate ${
+                latestTelemetryStatus === "stale"
+                  ? "text-[#9B4540]"
+                  : latestTelemetryStatus === "delayed"
+                  ? "text-[#A99A80]"
+                  : latestTelemetryStatus === "fresh"
+                  ? "text-[#82977D]"
+                  : latestTelemetryTime
+                  ? "text-[#F0EDE5]"
+                  : "text-[#736F66]"
+              }`}
+            >
+              {latestTelemetryTime || "No Telemetry"}
             </div>
-            <span className="text-[10px] text-[#82977D] flex items-center gap-1">
+            <span
+              className={`text-[10px] flex items-center gap-1 ${
+                latestTelemetryStatus === "stale"
+                  ? "text-[#A99A80]"
+                  : latestTelemetryStatus === "fresh"
+                  ? "text-[#82977D]"
+                  : "text-[#736F66]"
+              }`}
+            >
               <Database className="w-2.5 h-2.5" />
-              <span>DB {databaseStatus}</span>
+              <span>
+                DB {databaseStatus} ·{" "}
+                {latestTelemetryStatus === "stale"
+                  ? "Stream Stale"
+                  : latestTelemetryStatus === "delayed"
+                  ? "Lagging"
+                  : latestTelemetryStatus === "fresh"
+                  ? "Live Feed"
+                  : "Idle"}
+              </span>
             </span>
           </div>
         </div>

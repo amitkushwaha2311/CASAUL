@@ -287,4 +287,75 @@ describe("Platform Overview Dashboard (/app)", () => {
       expect(apiClient.listGraphs).toHaveBeenCalledTimes(2);
     });
   });
+
+  it("displays explicit stale telemetry status when observations are historical (>= 24h old)", async () => {
+    // 15 October observation timestamp
+    const staleSummary = {
+      ...mockSummaryGraph1,
+      latest_state_update_at: "2026-10-15T04:48:35Z",
+    };
+    vi.mocked(apiClient.getSystemStateSummary).mockImplementation(async (id: string) => {
+      if (id === "graph-001") return staleSummary;
+      return { ...mockSummaryGraph2, latest_state_update_at: "2026-10-15T04:40:00Z" };
+    });
+
+    render(<OverviewDashboard />);
+
+    await waitFor(() => {
+      // Platform overview freshness badge should indicate Stale and contain the historical date
+      const freshnessBadge = document.getElementById("telemetry-freshness-value");
+      expect(freshnessBadge).toBeInTheDocument();
+      expect(freshnessBadge?.textContent).toContain("Stale");
+      expect(freshnessBadge?.textContent).toContain("15 Oct 2026");
+
+      // Card 3 should display explicit STALE TELEMETRY status
+      expect(screen.getByText("STALE TELEMETRY")).toBeInTheDocument();
+      // Card 3 should display honest UTC observation timestamp (15 Oct 2026, 04:48:35 UTC)
+      expect(screen.getByText("15 Oct 2026, 04:48:35 UTC")).toBeInTheDocument();
+      // Card 3 should display active client polling interval distinctly from telemetry status
+      expect(screen.getByText(/Active \(30s interval · Synced/)).toBeInTheDocument();
+    });
+  });
+
+  it("displays live telemetry status when fresh observation arrives (< 5m old)", async () => {
+    const freshTimestamp = new Date(Date.now() - 30_000).toISOString();
+    const freshSummary = {
+      ...mockSummaryGraph1,
+      latest_state_update_at: freshTimestamp,
+    };
+    vi.mocked(apiClient.getSystemStateSummary).mockImplementation(async (id: string) => {
+      if (id === "graph-001") return freshSummary;
+      return { ...mockSummaryGraph2, latest_state_update_at: null };
+    });
+
+    render(<OverviewDashboard />);
+
+    await waitFor(() => {
+      const freshnessBadge = document.getElementById("telemetry-freshness-value");
+      expect(freshnessBadge).toBeInTheDocument();
+      expect(freshnessBadge?.textContent).toContain("Live (");
+      expect(screen.getByText("LIVE")).toBeInTheDocument();
+    });
+  });
+
+  it("displays honest no-data state when no observations have been ingested", async () => {
+    const noObsSummary = {
+      ...mockSummaryGraph1,
+      latest_state_update_at: null,
+    };
+    vi.mocked(apiClient.getSystemStateSummary).mockImplementation(async (id: string) => {
+      if (id === "graph-001") return noObsSummary;
+      return { ...mockSummaryGraph2, latest_state_update_at: null };
+    });
+
+    render(<OverviewDashboard />);
+
+    await waitFor(() => {
+      const freshnessBadge = document.getElementById("telemetry-freshness-value");
+      expect(freshnessBadge).toBeInTheDocument();
+      expect(freshnessBadge?.textContent).toBe("No observations ingested");
+      expect(screen.getByText("No observations")).toBeInTheDocument();
+      expect(screen.getByText("NO DATA")).toBeInTheDocument();
+    });
+  });
 });
