@@ -1,12 +1,14 @@
 /**
  * CAUSAL — Sign In page (/login)
  *
- * Split-screen layout:
- *   Left  — infrastructure-inspired animated visual (obsidian/charcoal)
- *   Right — editorial login form (warm ivory / muted bronze palette)
+ * Cast & Render Visual Reference applied to CAUSAL:
+ *   - Fixed full-screen CloudFront video background with dark CAUSAL wash & grain
+ *   - Inter Tight typography (weights 400 & 500)
+ *   - Pill-shaped controls and restrained borders
+ *   - Left  — cyber-physical infrastructure-network visual (obsidian / charcoal / muted bronze)
+ *   - Right — editorial authentication card with frosted glass depth
  *
- * On success: redirects to ?redirect= or /app
- * On failure: shows inline error with animation
+ * Preserves all authentication logic, tokens, redirect queries, route guards, and accessibility.
  */
 
 "use client";
@@ -15,103 +17,178 @@ import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { AuthShell } from "@/components/auth/auth-shell";
 
 // ── Infrastructure Visual (Left Panel) ───────────────────────
 
 function InfrastructureVisual() {
   return (
-    <div className="relative w-full h-full overflow-hidden bg-[#111210] flex flex-col justify-between p-10">
-      {/* Grid overlay */}
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: "40px",
+        overflow: "hidden",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* Subtle grid pattern */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(240,237,229,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(240,237,229,0.04) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+            "linear-gradient(rgba(240, 237, 229, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(240, 237, 229, 0.035) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          pointerEvents: "none",
         }}
       />
 
-      {/* Gradient orb */}
+      {/* Atmospheric radial glow */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
-          top: "25%",
-          left: "30%",
-          width: "340px",
-          height: "340px",
+          top: "30%",
+          left: "35%",
+          width: "360px",
+          height: "360px",
           background:
-            "radial-gradient(circle, rgba(169,154,128,0.12) 0%, rgba(130,151,125,0.06) 45%, transparent 70%)",
+            "radial-gradient(circle, rgba(169, 154, 128, 0.12) 0%, rgba(130, 151, 125, 0.05) 50%, transparent 70%)",
           borderRadius: "50%",
-          filter: "blur(40px)",
+          filter: "blur(48px)",
           transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
         }}
       />
 
-      {/* Wordmark */}
-      <div className="relative z-10">
-        <Link href="/" className="inline-flex items-center gap-3 group">
+      {/* Header: Brand & Live Indicator Pill */}
+      <div style={{ position: "relative", zIndex: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+          {/* CAUSAL Wordmark */}
+          <Link
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 12,
+              textDecoration: "none",
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                border: "1px solid rgba(240, 237, 229, 0.18)",
+                background: "#191A17",
+                borderRadius: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
+              }}
+            >
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: 2,
+                  background: "#A99A80",
+                  display: "block",
+                }}
+              />
+            </div>
+            <div>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  letterSpacing: "-0.02em",
+                  color: "#F0EDE5",
+                  lineHeight: 1.1,
+                }}
+              >
+                CAUSAL
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
+                  fontSize: 10,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "#A7A398",
+                  marginTop: 2,
+                }}
+              >
+                Resilience Engine
+              </div>
+            </div>
+          </Link>
+
+          {/* Editorial Status Indicator */}
           <div
             style={{
-              width: 32,
-              height: 32,
-              border: "1px solid rgba(240,237,229,0.18)",
-              background: "#191A17",
-              borderRadius: 6,
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
+              gap: 6,
+              padding: "4px 10px",
+              background: "rgba(169, 154, 128, 0.08)",
+              border: "1px solid rgba(169, 154, 128, 0.18)",
+              borderRadius: 9999,
             }}
           >
             <span
               style={{
-                width: 6,
-                height: 6,
-                borderRadius: 2,
-                background: "#A99A80",
-                display: "block",
+                width: 5,
+                height: 5,
+                borderRadius: "50%",
+                background: "#82977D",
+                boxShadow: "0 0 6px rgba(130, 151, 125, 0.8)",
+                display: "inline-block",
+                animation: "pulseDot 2.4s ease-in-out infinite",
               }}
             />
-          </div>
-          <div>
-            <div
+            <span
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: 700,
-                fontSize: 15,
-                letterSpacing: "-0.02em",
-                color: "#F0EDE5",
-              }}
-            >
-              CAUSAL
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-mono)",
+                fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
                 fontSize: 10,
-                letterSpacing: "0.1em",
+                fontWeight: 500,
+                letterSpacing: "0.06em",
                 textTransform: "uppercase",
-                color: "#736F66",
-                marginTop: 1,
+                color: "#A99A80",
               }}
             >
-              Resilience Engine
-            </div>
+              Online
+            </span>
           </div>
-        </Link>
+        </div>
       </div>
 
-      {/* SVG Network */}
-      <div className="relative z-10 flex-1 flex items-center justify-center py-12">
+      {/* SVG Network Illustration */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px 0",
+        }}
+      >
         <svg
           width="360"
           height="280"
           viewBox="0 0 360 280"
           fill="none"
           aria-hidden="true"
+          style={{ maxWidth: "100%", height: "auto" }}
         >
           {/* Connection lines */}
           <line x1="180" y1="140" x2="80" y2="60" stroke="rgba(169,154,128,0.25)" strokeWidth="1" strokeDasharray="4 4" />
@@ -125,42 +202,43 @@ function InfrastructureVisual() {
 
           {/* Central node */}
           <circle cx="180" cy="140" r="18" fill="rgba(169,154,128,0.12)" stroke="#A99A80" strokeWidth="1.5" />
-          <circle cx="180" cy="140" r="8" fill="#A99A80" opacity="0.8" />
+          <circle cx="180" cy="140" r="8" fill="#A99A80" opacity="0.85" />
 
           {/* Peripheral nodes */}
           <circle cx="80" cy="60" r="10" fill="rgba(130,151,125,0.15)" stroke="rgba(130,151,125,0.6)" strokeWidth="1" />
-          <circle cx="80" cy="60" r="4" fill="#82977D" opacity="0.7" />
+          <circle cx="80" cy="60" r="4" fill="#82977D" opacity="0.75" />
 
           <circle cx="280" cy="60" r="10" fill="rgba(169,154,128,0.1)" stroke="rgba(169,154,128,0.4)" strokeWidth="1" />
-          <circle cx="280" cy="60" r="4" fill="#A99A80" opacity="0.5" />
+          <circle cx="280" cy="60" r="4" fill="#A99A80" opacity="0.6" />
 
           <circle cx="60" cy="200" r="10" fill="rgba(169,154,128,0.1)" stroke="rgba(169,154,128,0.4)" strokeWidth="1" />
-          <circle cx="60" cy="200" r="4" fill="#A99A80" opacity="0.5" />
+          <circle cx="60" cy="200" r="4" fill="#A99A80" opacity="0.6" />
 
           <circle cx="300" cy="200" r="10" fill="rgba(130,151,125,0.12)" stroke="rgba(130,151,125,0.5)" strokeWidth="1" />
-          <circle cx="300" cy="200" r="4" fill="#82977D" opacity="0.6" />
+          <circle cx="300" cy="200" r="4" fill="#82977D" opacity="0.7" />
 
           {/* Node labels */}
-          <text x="80" y="45" textAnchor="middle" fill="rgba(240,237,229,0.4)" fontSize="9" fontFamily="monospace">API-GATEWAY</text>
-          <text x="280" y="45" textAnchor="middle" fill="rgba(240,237,229,0.4)" fontSize="9" fontFamily="monospace">AUTH-SVC</text>
-          <text x="50" y="222" textAnchor="middle" fill="rgba(240,237,229,0.4)" fontSize="9" fontFamily="monospace">DB-PRIMARY</text>
-          <text x="312" y="222" textAnchor="middle" fill="rgba(240,237,229,0.4)" fontSize="9" fontFamily="monospace">CACHE</text>
-          <text x="180" y="167" textAnchor="middle" fill="rgba(240,237,229,0.5)" fontSize="9" fontFamily="monospace" fontWeight="bold">CAUSAL</text>
+          <text x="80" y="44" textAnchor="middle" fill="rgba(240,237,229,0.45)" fontSize="9" fontFamily="var(--font-mono)">API-GATEWAY</text>
+          <text x="280" y="44" textAnchor="middle" fill="rgba(240,237,229,0.45)" fontSize="9" fontFamily="var(--font-mono)">AUTH-SVC</text>
+          <text x="50" y="222" textAnchor="middle" fill="rgba(240,237,229,0.45)" fontSize="9" fontFamily="var(--font-mono)">DB-PRIMARY</text>
+          <text x="312" y="222" textAnchor="middle" fill="rgba(240,237,229,0.45)" fontSize="9" fontFamily="var(--font-mono)">CACHE</text>
+          <text x="180" y="168" textAnchor="middle" fill="rgba(240,237,229,0.7)" fontSize="9" fontFamily="var(--font-mono)" fontWeight="bold">CAUSAL</text>
 
           {/* Animated pulse ring */}
           <circle cx="180" cy="140" r="18" fill="none" stroke="#A99A80" strokeWidth="1" opacity="0.3">
-            <animate attributeName="r" from="18" to="36" dur="2.5s" repeatCount="indefinite" />
-            <animate attributeName="opacity" from="0.3" to="0" dur="2.5s" repeatCount="indefinite" />
+            <animate attributeName="r" from="18" to="38" dur="2.8s" repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.3" to="0" dur="2.8s" repeatCount="indefinite" />
           </circle>
         </svg>
       </div>
 
       {/* Footer quote */}
-      <div className="relative z-10">
+      <div style={{ position: "relative", zIndex: 10 }}>
         <blockquote
           style={{
-            borderLeft: "2px solid rgba(169,154,128,0.35)",
+            borderLeft: "2px solid rgba(169, 154, 128, 0.4)",
             paddingLeft: 16,
+            margin: 0,
           }}
         >
           <p
@@ -169,20 +247,22 @@ function InfrastructureVisual() {
               fontStyle: "italic",
               fontSize: 14,
               lineHeight: 1.6,
-              color: "rgba(240,237,229,0.55)",
+              color: "rgba(240, 237, 229, 0.65)",
+              margin: 0,
             }}
           >
             &ldquo;See the cascade before it happens.&rdquo;
           </p>
           <cite
             style={{
-              fontFamily: "var(--font-mono)",
+              fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
               fontSize: 10,
-              letterSpacing: "0.1em",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
               color: "#736F66",
               marginTop: 6,
               display: "block",
+              fontStyle: "normal",
             }}
           >
             CAUSAL Platform
@@ -231,12 +311,12 @@ function LoginForm() {
 
   if (isLoading || isAuthenticated) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 280 }}>
         <div
           style={{
             width: 24,
             height: 24,
-            border: "2px solid rgba(169,154,128,0.2)",
+            border: "2px solid rgba(169, 154, 128, 0.2)",
             borderTopColor: "#A99A80",
             borderRadius: "50%",
             animation: "spin 0.8s linear infinite",
@@ -246,28 +326,69 @@ function LoginForm() {
     );
   }
 
+  const isFormValid = email.trim().length > 0 && password.length > 0;
+  const isButtonDisabled = isSubmitting || !isFormValid;
+
   return (
-    <div className="flex flex-col justify-center h-full px-8 py-12 max-w-[440px] mx-auto w-full">
-      {/* Header */}
-      <div style={{ marginBottom: 40 }}>
+    <div>
+      {/* Editorial Category Pill & Heading */}
+      <div style={{ marginBottom: 32 }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 7,
+            padding: "4px 12px",
+            background: "rgba(169, 154, 128, 0.08)",
+            border: "1px solid rgba(169, 154, 128, 0.18)",
+            borderRadius: 9999,
+            marginBottom: 16,
+          }}
+        >
+          <span
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              background: "#82977D",
+              boxShadow: "0 0 6px rgba(130, 151, 125, 0.8)",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
+              fontSize: 10,
+              fontWeight: 500,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "#A99A80",
+            }}
+          >
+            Infrastructure Access
+          </span>
+        </div>
+
         <h1
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: 700,
+            fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
+            fontWeight: 500,
             fontSize: 26,
-            letterSpacing: "-0.03em",
+            letterSpacing: "-0.025em",
             color: "#F0EDE5",
             margin: 0,
+            lineHeight: 1.2,
           }}
         >
           Sign in
         </h1>
         <p
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 12,
-            color: "#736F66",
+            fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
+            fontSize: 13,
+            color: "#A7A398",
             marginTop: 8,
+            marginBottom: 0,
             lineHeight: 1.5,
           }}
         >
@@ -275,46 +396,63 @@ function LoginForm() {
         </p>
       </div>
 
-      {/* Error Alert */}
+      {/* Error Alert (Oxide Red) */}
       {error && (
         <div
           role="alert"
           id="login-error-alert"
           style={{
-            background: "rgba(200,80,60,0.1)",
-            border: "1px solid rgba(200,80,60,0.35)",
-            borderRadius: 8,
-            padding: "10px 14px",
+            background: "rgba(155, 69, 64, 0.12)",
+            border: "1px solid rgba(155, 69, 64, 0.35)",
+            borderRadius: 12,
+            padding: "11px 14px",
             marginBottom: 24,
             display: "flex",
             alignItems: "flex-start",
             gap: 10,
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgb(220,80,60)" strokeWidth={2} style={{ marginTop: 1, flexShrink: 0 }}>
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#9B4540"
+            strokeWidth={2}
+            style={{ marginTop: 2, flexShrink: 0 }}
+            aria-hidden="true"
+          >
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "rgb(220,80,60)", lineHeight: 1.5 }}>
+          <span
+            style={{
+              fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
+              fontSize: 12,
+              color: "#F0EDE5",
+              lineHeight: 1.5,
+            }}
+          >
             {error}
           </span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} noValidate>
-        {/* Email field */}
+        {/* Email Field */}
         <div style={{ marginBottom: 20 }}>
           <label
             htmlFor="login-email"
             style={{
-              fontFamily: "var(--font-mono)",
+              fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
               fontSize: 11,
-              letterSpacing: "0.08em",
+              fontWeight: 500,
+              letterSpacing: "0.06em",
               textTransform: "uppercase",
               color: "#A7A398",
               display: "block",
-              marginBottom: 7,
+              marginBottom: 8,
             }}
           >
             Email
@@ -330,38 +468,43 @@ function LoginForm() {
             placeholder="you@organization.com"
             style={{
               width: "100%",
-              background: "#191A17",
-              border: "1px solid rgba(240,237,229,0.14)",
-              borderRadius: 8,
-              padding: "11px 14px",
-              fontFamily: "var(--font-mono)",
+              background: "rgba(25, 26, 23, 0.88)",
+              border: "1px solid rgba(240, 237, 229, 0.14)",
+              borderRadius: 9999,
+              padding: "12px 20px",
+              fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
               fontSize: 13,
               color: "#F0EDE5",
               outline: "none",
               boxSizing: "border-box",
-              transition: "border-color 0.15s",
+              transition: "border-color 0.2s, box-shadow 0.2s, background-color 0.2s",
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = "rgba(169,154,128,0.6)";
+              e.target.style.borderColor = "#A99A80";
+              e.target.style.boxShadow = "0 0 0 3px rgba(169, 154, 128, 0.2)";
+              e.target.style.background = "#20211D";
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "rgba(240,237,229,0.14)";
+              e.target.style.borderColor = "rgba(240, 237, 229, 0.14)";
+              e.target.style.boxShadow = "none";
+              e.target.style.background = "rgba(25, 26, 23, 0.88)";
             }}
           />
         </div>
 
-        {/* Password field */}
+        {/* Password Field */}
         <div style={{ marginBottom: 28 }}>
           <label
             htmlFor="login-password"
             style={{
-              fontFamily: "var(--font-mono)",
+              fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
               fontSize: 11,
-              letterSpacing: "0.08em",
+              fontWeight: 500,
+              letterSpacing: "0.06em",
               textTransform: "uppercase",
               color: "#A7A398",
               display: "block",
-              marginBottom: 7,
+              marginBottom: 8,
             }}
           >
             Password
@@ -378,22 +521,26 @@ function LoginForm() {
               placeholder="••••••••"
               style={{
                 width: "100%",
-                background: "#191A17",
-                border: "1px solid rgba(240,237,229,0.14)",
-                borderRadius: 8,
-                padding: "11px 44px 11px 14px",
-                fontFamily: "var(--font-mono)",
+                background: "rgba(25, 26, 23, 0.88)",
+                border: "1px solid rgba(240, 237, 229, 0.14)",
+                borderRadius: 9999,
+                padding: "12px 48px 12px 20px",
+                fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
                 fontSize: 13,
                 color: "#F0EDE5",
                 outline: "none",
                 boxSizing: "border-box",
-                transition: "border-color 0.15s",
+                transition: "border-color 0.2s, box-shadow 0.2s, background-color 0.2s",
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = "rgba(169,154,128,0.6)";
+                e.target.style.borderColor = "#A99A80";
+                e.target.style.boxShadow = "0 0 0 3px rgba(169, 154, 128, 0.2)";
+                e.target.style.background = "#20211D";
               }}
               onBlur={(e) => {
-                e.target.style.borderColor = "rgba(240,237,229,0.14)";
+                e.target.style.borderColor = "rgba(240, 237, 229, 0.14)";
+                e.target.style.boxShadow = "none";
+                e.target.style.background = "rgba(25, 26, 23, 0.88)";
               }}
             />
             <button
@@ -403,27 +550,40 @@ function LoginForm() {
               onClick={() => setShowPassword(!showPassword)}
               style={{
                 position: "absolute",
-                right: 12,
+                right: 14,
                 top: "50%",
                 transform: "translateY(-50%)",
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
                 color: "#736F66",
-                padding: 4,
-                display: "flex",
-                alignItems: "center",
+                padding: 0,
+                transition: "color 0.15s, background-color 0.15s",
               }}
               aria-label={showPassword ? "Hide password" : "Show password"}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = "#F0EDE5";
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(240, 237, 229, 0.08)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = "#736F66";
+                (e.currentTarget as HTMLButtonElement).style.background = "none";
+              }}
             >
               {showPassword ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75}>
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
                   <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
                   <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
               ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75}>
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
@@ -432,27 +592,43 @@ function LoginForm() {
           </div>
         </div>
 
-        {/* Submit */}
+        {/* Pill Submit Button */}
         <button
           type="submit"
           id="login-submit-btn"
-          disabled={isSubmitting || !email || !password}
+          disabled={isButtonDisabled}
           style={{
             width: "100%",
-            background: isSubmitting || !email || !password ? "rgba(240,237,229,0.12)" : "#F0EDE5",
-            color: isSubmitting || !email || !password ? "#736F66" : "#111210",
+            background: isButtonDisabled ? "rgba(240, 237, 229, 0.10)" : "#F0EDE5",
+            color: isButtonDisabled ? "#736F66" : "#111210",
             border: "none",
-            borderRadius: 8,
-            padding: "12px 20px",
-            fontFamily: "var(--font-mono)",
+            borderRadius: 9999,
+            padding: "13px 24px",
+            fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
             fontSize: 13,
-            fontWeight: 600,
-            cursor: isSubmitting || !email || !password ? "not-allowed" : "pointer",
-            transition: "all 0.15s",
+            fontWeight: 500,
+            letterSpacing: "-0.01em",
+            cursor: isButtonDisabled ? "not-allowed" : "pointer",
+            boxShadow: isButtonDisabled ? "none" : "0 4px 16px rgba(0, 0, 0, 0.4)",
+            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: 8,
+          }}
+          onMouseEnter={(e) => {
+            if (!isButtonDisabled) {
+              (e.currentTarget as HTMLButtonElement).style.background = "#FFFFFF";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 6px 20px rgba(240, 237, 229, 0.25)";
+              (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isButtonDisabled) {
+              (e.currentTarget as HTMLButtonElement).style.background = "#F0EDE5";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.4)";
+              (e.currentTarget as HTMLButtonElement).style.transform = "none";
+            }
           }}
         >
           {isSubmitting ? (
@@ -461,7 +637,7 @@ function LoginForm() {
                 style={{
                   width: 14,
                   height: 14,
-                  border: "2px solid rgba(17,18,16,0.2)",
+                  border: "2px solid rgba(17, 18, 16, 0.2)",
                   borderTopColor: "#111210",
                   borderRadius: "50%",
                   animation: "spin 0.8s linear infinite",
@@ -475,11 +651,12 @@ function LoginForm() {
         </button>
       </form>
 
-      {/* Footer */}
+      {/* Footer Navigation Link */}
       <p
         style={{
-          marginTop: 28,
-          fontFamily: "var(--font-mono)",
+          marginTop: 26,
+          marginBottom: 0,
+          fontFamily: "'Inter Tight', var(--font-sans), sans-serif",
           fontSize: 12,
           color: "#736F66",
           textAlign: "center",
@@ -489,7 +666,12 @@ function LoginForm() {
         <Link
           href="/signup"
           id="login-signup-link"
-          style={{ color: "#A99A80", textDecoration: "none" }}
+          style={{
+            color: "#A99A80",
+            textDecoration: "none",
+            fontWeight: 500,
+            transition: "color 0.15s",
+          }}
           onMouseEnter={(e) => {
             (e.target as HTMLAnchorElement).style.color = "#F0EDE5";
           }}
@@ -508,54 +690,10 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <>
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          background: "#111210",
-        }}
-      >
-        {/* Left: Infrastructure Visual */}
-        <div
-          style={{
-            flex: "0 0 520px",
-            display: "none",
-          }}
-          className="auth-left-panel"
-        >
-          <InfrastructureVisual />
-        </div>
-
-        {/* Right: Login Form */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            background: "#111210",
-            borderLeft: "1px solid rgba(240,237,229,0.08)",
-            minHeight: "100vh",
-          }}
-        >
-          <Suspense fallback={<div />}>
-            <LoginForm />
-          </Suspense>
-        </div>
-      </div>
-
-      <style>{`
-        @media (min-width: 900px) {
-          .auth-left-panel {
-            display: flex !important;
-            flex-direction: column;
-          }
-        }
-      `}</style>
-    </>
+    <AuthShell visual={<InfrastructureVisual />}>
+      <Suspense fallback={<div />}>
+        <LoginForm />
+      </Suspense>
+    </AuthShell>
   );
 }
