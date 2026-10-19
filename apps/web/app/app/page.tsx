@@ -13,7 +13,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import App from "@/src/App";
+import { CommandCenterHero } from "@/components/dashboard/command-center-hero";
 import { apiClient } from "@/lib/api-client";
 import {
   Badge,
@@ -342,12 +342,23 @@ export default function OverviewDashboard() {
   }
 
   return (
-    <div className="flex flex-col w-full">
-      {/* ── RIVR Glassmorphism Hero (Post-Login Authenticated Experience) ── */}
-      <App />
+    <div className="p-4 sm:p-6 lg:p-8 max-w-[1640px] mx-auto space-y-6 text-[#F0EDE5]">
+      {/* ── Genuine CAUSAL Infrastructure Resilience Command Center Hero ── */}
+      <CommandCenterHero
+        graphsCount={graphs.length}
+        totalNodes={totalNodes}
+        normalNodes={normalNodes}
+        degradedNodes={degradedNodes}
+        criticalNodes={criticalNodes}
+        activeIncidentsCount={criticalEvents.length}
+        hypothesesCount={allHypotheses.length}
+        supportedHypothesesCount={supportedHypotheses.length}
+        avgHealthPercent={avgHealthPercent}
+        latestTelemetryTime={formatRelativeTime(latestStateUpdateAt)}
+        databaseStatus={health?.database}
+        causalEngineActive={systemStatus?.features.causal_engine}
+      />
 
-      {/* ── CAUSAL Platform Overview Telemetry Dashboard ── */}
-      <div id="overview-telemetry-dashboard" className="p-4 sm:p-6 lg:p-8 max-w-[1640px] mx-auto space-y-6 text-[#F0EDE5] w-full bg-[#111210]">
       {/* ── Top Header Bar ────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[rgba(240,237,229,0.08)]">
         <div>
@@ -906,6 +917,5 @@ export default function OverviewDashboard() {
         </div>
       </div>
     </div>
-  </div>
   );
 }
